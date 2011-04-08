@@ -1,6 +1,6 @@
 The MIT License
 
-Copyright (C) 2010-2011 by Pan Luo, 
+Copyright (C) 2010-2011 by Pan Luo,
 Centre for Teaching, Learning and Technology, 
 University of British Columbia
 
