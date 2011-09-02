@@ -211,7 +211,7 @@ class AuthModule extends Object {
    * @return void
    */
   function extractConfig() {
-    $configs = Configure::read('Guard.AuthModule.' . $this->name);
+    $configs = $this->getParameters();
     if(!empty($configs)) {
       foreach($configs as $k => $v) {
         if(isset($this->$k) && is_array($this->$k)) {
@@ -223,6 +223,16 @@ class AuthModule extends Object {
         }
       }
     }
+  }
+
+  /**
+   * getParameters return the paramters defined in configuration
+   * 
+   * @access public
+   * @return void
+   */
+  function getParameters() {
+    return Configure::read('Guard.AuthModule.' . $this->name);
   }
 
   /**

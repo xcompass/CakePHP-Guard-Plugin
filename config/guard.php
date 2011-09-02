@@ -12,4 +12,6 @@ $config['Guard.AuthModule.Shibboleth'] = array('sessionInitiatorURL' => 'https:/
                                                                               'affiliation' => array('/staff@ubc.ca/' => 'admin'),
                                                                              ),
                                                'loginError'          => 'You have successfully logged through Shibboleth. But you do not have access this appliction.',
+                                               'loginImageButton'    => '',
+                                               'loginTextButton'     => 'Login',
                                               ); 
