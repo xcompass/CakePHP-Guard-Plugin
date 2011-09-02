@@ -317,6 +317,16 @@ class GuardComponent extends AuthComponent {
   }
 
   /**
+   * getParameters get paramters defined in configuration
+   * 
+   * @access public
+   * @return void
+   */
+  function getParameters() {
+    return $this->authModule->getParameters();
+  }
+
+  /**
    * _getModuleSearchPath get the paths for searching the authentication modules. 
    * Usually user defined authentication modules are placed in app/libs
    * 
@@ -343,4 +353,5 @@ class GuardComponent extends AuthComponent {
       }
     }
   }
+
 }
