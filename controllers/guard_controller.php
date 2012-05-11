@@ -6,7 +6,7 @@ class GuardController extends AppController {
 
     /**
      * login login action
-     * 
+     *
      * @access public
      * @return void
      */
@@ -17,11 +17,17 @@ class GuardController extends AppController {
 
         // check if the auth module needs a login form or just a button
         $this->set('auth_module_name', $this->Auth->getAuthModuleName());
+
+        // this redirect only happens when autoRedirect is set to false
+        // so that application can do some stuff after user login
+        if( !(empty($this->data)) && $this->Auth->user() ){
+            $this->redirect('/login');
+        }
     }
 
     /**
      * logout logout action
-     * 
+     *
      * @access public
      * @return void
      */
