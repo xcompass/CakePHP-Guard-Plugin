@@ -21,11 +21,10 @@ $config['Guard.AuthModule.Shibboleth'] = array(
 );
 
 $config['Guard.AuthModule.Ldap'] = array(
-    'host' => 'ldaps://ldapcons.stg.id.ubc.ca/',
+    'host' => 'ldaps://ldap.school.ca/',
     'port' => 636,
-    'serviceUsername' => 'uid=ipeer, ou=Special Users, o=ubc.ca', // username to connect to LDAP
-    'servicePassword' => '', // password to connect to LDAP
-    'baseDn' => 'ou=Campus Login, o=ubc.ca',
-    'usernameField' => 'cwlLoginName',
-    'passwordField' => 'password',
+    'serviceUsername' => 'uid=USERNAME, ou=Special Users, o=school.ca', // username to connect to LDAP
+    'servicePassword' => 'PASSWORD', // password to connect to LDAP
+    'baseDn' => 'ou=Campus Login, o=school.ca',
+    'usernameField' => 'uid',
 );
