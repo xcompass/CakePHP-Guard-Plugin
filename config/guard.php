@@ -27,4 +27,10 @@ $config['Guard.AuthModule.Ldap'] = array(
     'servicePassword' => 'PASSWORD', // password to connect to LDAP
     'baseDn' => 'ou=Campus Login, o=school.ca',
     'usernameField' => 'uid',
+    'attributeSearchFilters' => array(
+//        'uid',
+    ),
+    'attributeMap' => array(
+//        'username' => 'uid',
+    ),
 );

@@ -18,7 +18,7 @@ class LdapModule extends AuthModule
      * @var string
      * @access public
      */
-    var $name = 'Ldap';
+    public $name = 'Ldap';
 
     /**
      * hasLoginForm this module uses internal login page
@@ -26,7 +26,7 @@ class LdapModule extends AuthModule
      * @var mixed
      * @access public
      */
-    var $hasLoginForm = true;
+    public $hasLoginForm = true;
 
     /**
      * authenticate authenticate the user and generate the user session
@@ -58,7 +58,30 @@ class LdapModule extends AuthModule
 
         if (0 != $info['count']) {
             if (@ldap_bind($ds, $info[0]['dn'], $this->data[$this->guard->fields['password']])) {
-                // ldap success
+                // we need to get attributes
+                if (!empty($this->attributeMap)) {
+                    // construct filter
+                    $filters = array();
+                    $entry = ldap_first_entry($ds, $result);
+                    foreach ($this->attributeSearchFilters as $filter) {
+                        $values = ldap_get_values($ds, $entry, $filter);
+                        $filters[] = $filter.'='.$values[0];
+                    }
+
+                    // do the search
+                    if (!($result = ldap_search($ds, $info[0]['dn'], implode(',', $filters), array_values($this->attributeMap)))) {
+                        $this->guard->error(sprintf('Unable to perform LDAP seach with base DN %s and filter %s.',
+                            $info[0]['dn'], implode(',', $filters)));
+                        return false;
+                    }
+                    $entry = ldap_first_entry($ds, $result);
+                    foreach ($this->attributeMap as $key => $attribute) {
+                        $values = ldap_get_values($ds, $entry, $attribute);
+                        $this->data[$key] = $values[0];
+                    }
+                }
+
+                // ldap success, identify the user from local table
                 if ($user = $this->identify($this->data[$this->guard->fields['username']])) {
                     $this->Session->write($this->guard->sessionKey, $user);
                     $loggedIn = true;
