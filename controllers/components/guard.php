@@ -180,6 +180,10 @@ class GuardComponent extends AuthComponent {
       return true;
     }
 
+    if (method_exists($controller, 'beforeLogin')) {
+        $controller->beforeLogin();
+    }
+
     if ($loginAction == $url) {
       // we are in the login action
       if (!$this->authModule->hasLoginData()) {
@@ -272,9 +276,9 @@ class GuardComponent extends AuthComponent {
    */
   function logout() {
     $this->authModule->logout();
-    if (method_exists($controller, 'afterLogout')) {
+    /*if (method_exists($controller, 'afterLogout')) {
         $controller->afterLogout();
-    }
+    }*/
     return parent::logout();
   }
 
