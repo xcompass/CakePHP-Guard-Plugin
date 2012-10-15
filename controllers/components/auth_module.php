@@ -1,8 +1,8 @@
 <?php
 /**
- * AuthModule define the base class of the authentication module. All authentication 
+ * AuthModule define the base class of the authentication module. All authentication
  * modules should extend this class.
- * 
+ *
  * @uses Object
  * @package Plugins.Guard
  * @version //autogen//
@@ -13,9 +13,9 @@
 class AuthModule extends Object {
 
   /**
-   * hasLoginForm if the authentication module uses build-in login form. 
-   * authentication module can override its value if using external login form 
-   * 
+   * hasLoginForm if the authentication module uses build-in login form.
+   * authentication module can override its value if using external login form
+   *
    * @var boolean true, if the module uses login form. false, if the module uses
    * external authentication page.
    * @access protected
@@ -23,8 +23,8 @@ class AuthModule extends Object {
   var $hasLoginForm = true;
 
   /**
-   * guard guard component 
-   * 
+   * guard guard component
+   *
    * @var GuardComponent guard component object
    * @access protected
    */
@@ -32,7 +32,7 @@ class AuthModule extends Object {
 
   /**
    * controller controller object
-   * 
+   *
    * @var Controller controller object
    * @access protected
    */
@@ -40,7 +40,7 @@ class AuthModule extends Object {
 
   /**
    * Session the shortcut for session object in component
-   * 
+   *
    * @var Session
    * @access protected
    */
@@ -48,7 +48,7 @@ class AuthModule extends Object {
 
   /**
    * fields the copy of the fields array in AuthComponent
-   * 
+   *
    * @var array
    * @access protected
    * @see AuthComponent
@@ -56,8 +56,8 @@ class AuthModule extends Object {
   var $fields = array();
 
   /**
-   * data login data 
-   * 
+   * data login data
+   *
    * @var array
    * @access protected
    */
@@ -65,7 +65,7 @@ class AuthModule extends Object {
 
   /**
    * __construct contructor
-   * 
+   *
    * @param GuardComponent $guard pointor to the guard component
    * @param string $name the name of this authentication module
    * @access protected
@@ -87,11 +87,11 @@ class AuthModule extends Object {
   }
 
   /**
-   * hasLoginData test if the controller got the login data (submitted by form 
-   * or in HTTP header). The authentication module with out login form should 
-   * override this method to provide its own way to check if the login data is 
+   * hasLoginData test if the controller got the login data (submitted by form
+   * or in HTTP header). The authentication module with out login form should
+   * override this method to provide its own way to check if the login data is
    * received.
-   * 
+   *
    * @access public
    * @return boolean true if it got login data, false if not.
    */
@@ -110,7 +110,7 @@ class AuthModule extends Object {
 
   /**
    * getLoginData return the login data stored in authentication module
-   * 
+   *
    * @access public
    * @return array authentication data
    */
@@ -119,21 +119,21 @@ class AuthModule extends Object {
   }
 
   /**
-   * hasLoginForm getter method for hasLoginForm. test if authentication module 
+   * hasLoginForm getter method for hasLoginForm. test if authentication module
    * is using build-in login form
-   * 
+   *
    * @access public
    * @return boolean true, if the module uses login form. false, if the module uses
    * external authentication page.
    */
   function hasLoginForm() {
     return $this->hasLoginForm;
-  }    
+  }
 
   /**
-   * logout logout method. Authentication module should override it if there are 
+   * logout logout method. Authentication module should override it if there are
    * more clean up to do before logout.
-   * 
+   *
    * @access public
    * @return void
    */
@@ -142,7 +142,7 @@ class AuthModule extends Object {
 
   /**
    * isLoggedIn test if the user is logged in
-   * 
+   *
    * @access public
    * @return boolean true, if the user is logged in. false, if not.
    */
@@ -152,7 +152,7 @@ class AuthModule extends Object {
 
   /**
    * redirectToLogin redirect user to login page
-   * 
+   *
    * @param string $url the url to redirect to.
    * @access public
    * @return void
@@ -180,7 +180,7 @@ class AuthModule extends Object {
 
   /**
    * getLoginUrl return the login URL
-   * 
+   *
    * @access public
    * @return string the login URL
    */
@@ -190,7 +190,7 @@ class AuthModule extends Object {
 
   /**
    * urlNormalize replace the variables with values for URLs
-   * 
+   *
    * @param string $url the URL to be replaced
    * @access public
    * @return string the replaced URL
@@ -202,11 +202,11 @@ class AuthModule extends Object {
   }
 
   /**
-   * extractConfig extract the configurations to variables. All the 
-   * values that are defined configurations for this authentication module are 
-   * extract into properties to current module. The arrays are merged. Other 
+   * extractConfig extract the configurations to variables. All the
+   * values that are defined configurations for this authentication module are
+   * extract into properties to current module. The arrays are merged. Other
    * types of values are replaced if there are existing ones.
-   * 
+   *
    * @access public
    * @return void
    */
@@ -215,7 +215,7 @@ class AuthModule extends Object {
     if(!empty($configs)) {
       foreach($configs as $k => $v) {
         if(isset($this->$k) && is_array($this->$k)) {
-          // merge array, if already defined 
+          // merge array, if already defined
           $this->$k = array_merge($this->$k, $v);
         } else {
           // for other types of values, just replace them
@@ -227,7 +227,7 @@ class AuthModule extends Object {
 
   /**
    * getParameters return the paramters defined in configuration
-   * 
+   *
    * @access public
    * @return void
    */
@@ -236,13 +236,13 @@ class AuthModule extends Object {
   }
 
   /**
-   * _mapFields Mapping the fields from the external authentication module to 
-   * current system. The mappings are defiend in configuration files with 
+   * _mapFields Mapping the fields from the external authentication module to
+   * current system. The mappings are defiend in configuration files with
    * regular expressions. The mapped data are stored in $this->data
    * Authentication modules may not use this function if the fields are already
-   * matched. This method can be overridden to provide custom mapping. This 
+   * matched. This method can be overridden to provide custom mapping. This
    * method also calls convertField method to convert the value of each fields.
-   * 
+   *
    * @access protected
    * @return void
    * @see guard.php
@@ -255,12 +255,12 @@ class AuthModule extends Object {
   }
 
   /**
-   * convertField convert the values from external authenticatio module to match 
-   * the current sysatem. The converting rules are defined in configuration 
-   * file with regular expressions. This method can be overridden to provide 
-   * custom conversion.  
-   * 
-   * @param mixed $field the original field name from external authentication 
+   * convertField convert the values from external authenticatio module to match
+   * the current sysatem. The converting rules are defined in configuration
+   * file with regular expressions. This method can be overridden to provide
+   * custom conversion.
+   *
+   * @param mixed $field the original field name from external authentication
    * system
    * @param mixed $value the value to be converted
    * @access public
@@ -268,7 +268,7 @@ class AuthModule extends Object {
    */
   function convertField($field, $value) {
     if(isset($this->mappingRules) && isset($this->mappingRules[$field])) {
-      return preg_replace(array_keys($this->mappingRules[$field]), 
+      return preg_replace(array_keys($this->mappingRules[$field]),
                           array_values($this->mappingRules[$field]),
                           $value
                          );

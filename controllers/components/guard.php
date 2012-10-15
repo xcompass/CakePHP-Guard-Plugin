@@ -5,14 +5,14 @@ App::import('Component', 'Auth');
 App::import('AuthModule', 'AuthModule', true, array(dirname(__FILE__)), Inflector::underscore('AuthModule').'.php');
 
 /**
- * GuardComponent the guard component extended from CakePHP build-in 
- * AuthComponent. This component allows users to write their own authentication 
- * module easily. It also support loading the authentication module and 
- * parameters through configuration file, which will make it very easy to switch 
- * between authentication modules. 
- * 
+ * GuardComponent the guard component extended from CakePHP build-in
+ * AuthComponent. This component allows users to write their own authentication
+ * module easily. It also support loading the authentication module and
+ * parameters through configuration file, which will make it very easy to switch
+ * between authentication modules.
+ *
  * @uses AuthComponent
- * @package 
+ * @package
  * @version $id$
  * @copyright Copyright (C) 2010 CTLT
  * @author Compass
@@ -21,16 +21,16 @@ App::import('AuthModule', 'AuthModule', true, array(dirname(__FILE__)), Inflecto
 class GuardComponent extends AuthComponent {
   /**
    * controller controller pointer
-   * 
+   *
    * @var Controller the controller from which this component is called
    * @access public
    */
   var $controller          = null;
 
   /**
-   * authModule authentication module used, which will be dynamicly loaded 
+   * authModule authentication module used, which will be dynamicly loaded
    * according to the configuration file
-   * 
+   *
    * @var AuthModule
    * @access public
    */
@@ -38,7 +38,7 @@ class GuardComponent extends AuthComponent {
 
   /**
    * authModuleUndefined error message for undefined authentication module
-   * 
+   *
    * @var string
    * @access public
    */
@@ -46,25 +46,25 @@ class GuardComponent extends AuthComponent {
 
   /**
    * authModuleNotExist error message for non-existing authentication module
-   * 
+   *
    * @var string
    * @access public
    */
   var $authModuleNotExist  = 'The %s authentication module is not exists.';
 
   /**
-   * authMethodUndefined error message for undefined  method in authentication 
-   * module  
-   * 
+   * authMethodUndefined error message for undefined  method in authentication
+   * module
+   *
    * @var string
    * @access public
    */
   var $authMethodUndefined = 'Method %s is not defined in the authentication module %s.';
 
   /**
-   * authRequiredMethods the array of the required method that should be 
+   * authRequiredMethods the array of the required method that should be
    * implemented by the authentication module
-   * 
+   *
    * @var array
    * @access public
    */
@@ -72,19 +72,19 @@ class GuardComponent extends AuthComponent {
 
   /**
    * overridables the properties from AuthComponent that can be overridden by the configuration file
-   * 
+   *
    * @var array
    * @access public
    */
-  var $overridables        = array('userModel', 'fields', 'userScope', 'loginRedirect', 
-                                   'logoutRedirect', 'loginError', 'authError', 
+  var $overridables        = array('userModel', 'fields', 'userScope', 'loginRedirect',
+                                   'logoutRedirect', 'loginError', 'authError',
                                    'sessionKey', 'ajaxLogin', 'flashElement');
 
   /**
-   * initialize override the base method to provide additional initialization 
-   * and load the authentication module. The properies from AuthComponent may 
+   * initialize override the base method to provide additional initialization
+   * and load the authentication module. The properies from AuthComponent may
    * also be override if defined in configuration file.
-   * 
+   *
    * @param Controller $controller the controller that called this component
    * @param array $settings the settings to initialize
    * @access public
@@ -93,7 +93,7 @@ class GuardComponent extends AuthComponent {
   function initialize(&$controller, $settings=array()) {
     $this->controller =& $controller;
     // ugly hack to register myself to Auth because of the limitation of Cake
-    $this->controller->Auth = $this; 
+    $this->controller->Auth = $this;
 
     // initialize internal variables
     $this->loginAction = array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'login');
@@ -101,7 +101,7 @@ class GuardComponent extends AuthComponent {
     // check the authentication module and new it
     if(null == ($authModuleName = Configure::read('Guard.AuthModule.Name'))) {
       $this->error($this->authModuleUndefined);
-    } 
+    }
 
     $authModuleFullName = $authModuleName.'Module';
 
@@ -125,10 +125,10 @@ class GuardComponent extends AuthComponent {
   }
 
   /**
-   * startup Main login logic. It uses the authentication module method to 
-   * authenticate users and process of login data.  
-   * 
-   * @param Controller $controller the reference to the instantiating controller 
+   * startup Main login logic. It uses the authentication module method to
+   * authenticate users and process of login data.
+   *
+   * @param Controller $controller the reference to the instantiating controller
    * object
    * @access public
    * @return boolean
@@ -188,6 +188,9 @@ class GuardComponent extends AuthComponent {
         }
         return false;
       } else if($this->_loggedIn = $this->authModule->authenticate()) {
+        if (method_exists($controller, 'afterLogin')) {
+            $controller->afterLogin();
+        }
         if ($this->autoRedirect) {
           $controller->redirect($this->redirect(), null, true);
         }
@@ -201,7 +204,7 @@ class GuardComponent extends AuthComponent {
       return $this->authModule->redirectToLogin($url);
     }
 
-    // duplicated authorization code from AuthComponent as both authentication 
+    // duplicated authorization code from AuthComponent as both authentication
     // and authorization code are in the same method
     if (!$this->authorize) {
       return true;
@@ -251,9 +254,9 @@ class GuardComponent extends AuthComponent {
   }
 
   /**
-   * isLoggedIn test if the user is logged in. Calls isLoggedIn in 
+   * isLoggedIn test if the user is logged in. Calls isLoggedIn in
    * authentication module
-   * 
+   *
    * @access public
    * @return void
    */
@@ -263,19 +266,22 @@ class GuardComponent extends AuthComponent {
 
   /**
    * logout logout user. Calls logout in authentication module.
-   * 
+   *
    * @access public
    * @return void
    */
   function logout() {
     $this->authModule->logout();
+    if (method_exists($controller, 'afterLogout')) {
+        $controller->afterLogout();
+    }
     return parent::logout();
   }
 
   /**
    * error output an error message
-   * 
-   * @param mixed $message 
+   *
+   * @param mixed $message
    * @access public
    * @return void
    */
@@ -285,10 +291,10 @@ class GuardComponent extends AuthComponent {
   }
 
   /**
-   * getLoginUrl get the login URL, which will be generated by authentication 
-   * module, used for login buttons. By default, the URL is the login action. 
+   * getLoginUrl get the login URL, which will be generated by authentication
+   * module, used for login buttons. By default, the URL is the login action.
    * External authentication module like Shibboleth may generate a different URL.
-   * 
+   *
    * @access public
    * @return void
    */
@@ -298,7 +304,7 @@ class GuardComponent extends AuthComponent {
 
   /**
    * hasLoginForm test if the authentication uses a login form
-   * 
+   *
    * @access public
    * @return void
    */
@@ -307,8 +313,8 @@ class GuardComponent extends AuthComponent {
   }
 
   /**
-   * getAuthModuleName a shortcut to get the authentication module's name. 
-   * 
+   * getAuthModuleName a shortcut to get the authentication module's name.
+   *
    * @access public
    * @return void
    */
@@ -318,7 +324,7 @@ class GuardComponent extends AuthComponent {
 
   /**
    * getParameters get paramters defined in configuration
-   * 
+   *
    * @access public
    * @return void
    */
@@ -327,9 +333,9 @@ class GuardComponent extends AuthComponent {
   }
 
   /**
-   * _getModuleSearchPath get the paths for searching the authentication modules. 
+   * _getModuleSearchPath get the paths for searching the authentication modules.
    * Usually user defined authentication modules are placed in app/libs
-   * 
+   *
    * @access protected
    * @return void
    */
@@ -340,9 +346,9 @@ class GuardComponent extends AuthComponent {
   }
 
   /**
-   * _overrideVars override the properties in AuthComponent from configuration 
+   * _overrideVars override the properties in AuthComponent from configuration
    * file.
-   * 
+   *
    * @access protected
    * @return void
    */

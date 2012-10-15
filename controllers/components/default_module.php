@@ -2,7 +2,7 @@
 
 /**
  * DefaultModule the default authentication module, using AuthComponent
- * 
+ *
  * @uses AuthModule
  * @package Plugins.Guard
  * @version //autogen//
@@ -13,7 +13,7 @@
 class DefaultModule extends AuthModule {
     /**
      * name the name of the module
-     * 
+     *
      * @var string
      * @access protected
      */
@@ -21,21 +21,21 @@ class DefaultModule extends AuthModule {
 
     /**
      * hasLoginForm this module has login form
-     * 
+     *
      * @var boolean true
      * @access protected
      */
     var $hasLoginForm = true;
 
     /**
-     * authenticate provide the authenticate method. Checking against the 
-     * internal user table in the database. The user table can be defined by 
-     * UserModel variable. The method also creates the user session by useing 
+     * authenticate provide the authenticate method. Checking against the
+     * internal user table in the database. The user table can be defined by
+     * UserModel variable. The method also creates the user session by useing
      * AuthComponent::login().
-     * 
+     *
      * @param string $username not used
      * @access public
-     * @return boolean true, if the user is successfully authenticated. false, 
+     * @return boolean true, if the user is successfully authenticated. false,
      * if not
      */
     function authenticate($username = null) {
@@ -52,7 +52,7 @@ class DefaultModule extends AuthModule {
 
         $data = array(
             $model->alias . '.' . $this->fields['username'] => $data[$model->alias][$this->fields['username']],
-            $model->alias . '.' . $this->fields['password'] => $data[$model->alias][$this->fields['password']] 
+            $model->alias . '.' . $this->fields['password'] => $data[$model->alias][$this->fields['password']]
         );
 
         $loggedIn = $this->guard->login($data);
