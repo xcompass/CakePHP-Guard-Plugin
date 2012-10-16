@@ -276,9 +276,9 @@ class GuardComponent extends AuthComponent {
    */
   function logout() {
     $this->authModule->logout();
-    /*if (method_exists($controller, 'afterLogout')) {
-        $controller->afterLogout();
-    }*/
+    if (method_exists($this->controller, 'afterLogout')) {
+        $this->controller->afterLogout();
+    }
     return parent::logout();
   }
 
