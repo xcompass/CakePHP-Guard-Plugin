@@ -180,8 +180,8 @@ class GuardComponent extends AuthComponent {
       return true;
     }
 
-    if (method_exists($controller, 'beforeLogin')) {
-        $controller->beforeLogin();
+    if (method_exists($controller, '_beforeLogin')) {
+        $controller->_beforeLogin();
     }
 
     if ($loginAction == $url) {
@@ -192,8 +192,8 @@ class GuardComponent extends AuthComponent {
         }
         return false;
       } else if($this->_loggedIn = $this->authModule->authenticate()) {
-        if (method_exists($controller, 'afterLogin')) {
-            $controller->afterLogin();
+        if (method_exists($controller, '_afterLogin')) {
+            $controller->_afterLogin();
         }
         if ($this->autoRedirect) {
           $controller->redirect($this->redirect(), null, true);
@@ -276,8 +276,8 @@ class GuardComponent extends AuthComponent {
    */
   function logout() {
     $this->authModule->logout();
-    if (method_exists($this->controller, 'afterLogout')) {
-        $this->controller->afterLogout();
+    if (method_exists($this->controller, '_afterLogout')) {
+        $this->controller->_afterLogout();
     }
     return parent::logout();
   }
