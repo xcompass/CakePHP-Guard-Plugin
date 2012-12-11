@@ -33,4 +33,5 @@ $config['Guard.AuthModule.Ldap'] = array(
     'attributeMap' => array(
 //        'username' => 'uid',
     ),
+    'fallbackInternal' => true,
 );

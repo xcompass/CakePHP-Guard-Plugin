@@ -79,7 +79,7 @@ class AuthModule extends Object {
     $this->Session = $guard->Session;
 
     // check if authentication module name is set
-    if(!isset($this->name)) {
+    if (!isset($this->name)) {
       $this->name = $name;
     }
 
@@ -96,16 +96,14 @@ class AuthModule extends Object {
    * @return boolean true if it got login data, false if not.
    */
   function hasLoginData() {
-    if(false === $this->hasLoginForm()) {
+    if (false === $this->hasLoginForm()) {
       $this->guard->error('You should override hasLoginData() method in your authentication module as you do not have login form.');
       $this->__stop();
     }
 
-    if($hasData = !empty($this->controller->data) && isset($this->controller->data[$this->controller->name])) {
-      $this->data = $this->controller->data[$this->controller->name];
-    }
+    $data = $this->getLoginData();
 
-    return $hasData;
+    return (!empty($data));
   }
 
   /**
@@ -115,6 +113,9 @@ class AuthModule extends Object {
    * @return array authentication data
    */
   function getLoginData() {
+    if (!empty($this->controller->data) && isset($this->controller->data[$this->controller->name])) {
+      $this->data = $this->controller->data[$this->controller->name];
+    }
     return $this->data;
   }
 
@@ -212,9 +213,9 @@ class AuthModule extends Object {
    */
   function extractConfig() {
     $configs = $this->getParameters();
-    if(!empty($configs)) {
+    if (!empty($configs)) {
       foreach($configs as $k => $v) {
-        if(isset($this->$k) && is_array($this->$k)) {
+        if (isset($this->$k) && is_array($this->$k)) {
           // merge array, if already defined
           $this->$k = array_merge($this->$k, $v);
         } else {
@@ -249,7 +250,7 @@ class AuthModule extends Object {
    * @see convertField
    */
   function _mapFields() {
-    foreach($this->fieldMapping as $k => $v) {
+    foreach ($this->fieldMapping as $k => $v) {
       $this->data[$v] = self::convertField($k, $_SERVER[$k]);
     }
   }
@@ -267,7 +268,7 @@ class AuthModule extends Object {
    * @return string converted value
    */
   function convertField($field, $value) {
-    if(isset($this->mappingRules) && isset($this->mappingRules[$field])) {
+    if (isset($this->mappingRules) && isset($this->mappingRules[$field])) {
       return preg_replace(array_keys($this->mappingRules[$field]),
                           array_values($this->mappingRules[$field]),
                           $value
