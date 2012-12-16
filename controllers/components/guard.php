@@ -176,7 +176,7 @@ class GuardComponent extends AuthComponent {
             return true;
         }
 
-        if ($this->isLoggedIn()) {
+        if ($this->isLoggedIn() && $loginAction != $url) {
             return true;
         }
 
