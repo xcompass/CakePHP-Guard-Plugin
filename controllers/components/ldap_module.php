@@ -89,55 +89,17 @@ class LdapModule extends AuthModule
                             $this->data[$key] = $values[0];
                         }
                     }
-
-                    // ldap success, identify the user from local table
-                    if ($user = $this->identify($this->data[$this->guard->fields['username']])) {
-                        $this->Session->write($this->guard->sessionKey, $user);
-                        $loggedIn = true;
-                    }
+                    $loggedIn = true;
                 }
             }
 
         } catch (Exception $e) {
             CakeLog::write('error', $e->getMessage());
+            CakeLog::write('debug', $e->getMessage());
         }
 
         ldap_close($ds);
 
-        if (!$loggedIn && $this->fallbackInternal) {
-            CakeLog::write('debug', 'LDAP failed, fallback to internal authentication module.');
-            $internal = new DefaultModule($this->guard);
-            $loggedIn = $internal->authenticate($username);
-        }
-
         return $loggedIn;
     }
-
-    /**
-     * identify find the user from database
-     *
-     * @param bool $username   username
-     * @param bool $conditions search condition
-     *
-     * @access public
-     * @return array user array
-     */
-    function identify($username = null, $conditions = null)
-    {
-        // get the model AuthComponent is configured to use
-        $model =& $this->guard->getModel(); // default is User
-        // do a query that will find a User record when given successful login data
-        $user = $model->find('first', array('conditions' => array(
-            $model->escapeField($this->guard->fields['username']) => $username)
-        ));
-
-        // return null if user invalid
-        if (!$user) {
-            return null; // this is what AuthComponent::identify would return on failure
-        }
-
-        // call original AuthComponent::identify with string for $user and false for $conditions
-        return $this->guard->identify($user[$this->guard->userModel][$model->primaryKey], null);
-    }
-
 }

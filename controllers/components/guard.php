@@ -186,25 +186,47 @@ class GuardComponent extends AuthComponent {
 
         if ($loginAction == $url) {
             // we are in the login action
-            if (!$this->authModule->hasLoginData()) {
-                if (!$this->Session->check('Auth.redirect') && !$this->loginRedirect && env('HTTP_REFERER')) {
-                    $this->Session->write('Auth.redirect', $controller->referer(null, true));
+            try {
+                if (!$this->authModule->hasLoginData()) {
+                    if (!$this->Session->check('Auth.redirect') && !$this->loginRedirect && env('HTTP_REFERER')) {
+                        $this->Session->write('Auth.redirect', $controller->referer(null, true));
+                    }
+                    return false;
+                } else if ($this->authModule->authenticate()) {
+                    // authenticate success, identify the user from local table
+                    if (!($user = $this->authModule->identify($this->authModule->data[$this->fields['username']]))) {
+                        throw new Exception('Access Denied. You have successfully authenticated, but you do not have access to this application.');
+                    }
+
+                    $this->Session->write($this->sessionKey, $user);
+                } else {
+                    throw new Exception($this->loginError);
                 }
-                return false;
-            } else if ($this->_loggedIn = $this->authModule->authenticate()) {
-                CakeLog::write('debug', 'User logged in');
-                if (method_exists($controller, '_afterLogin')) {
-                    $controller->_afterLogin();
+            } catch (Exception $e) {
+                if (isset($this->authModule->fallbackInternal) && $this->authModule->fallbackInternal) {
+                    CakeLog::write('debug', 'Extneral authentication failed, fallback to internal authentication module.');
+                    $internal = new DefaultModule($this);
+                    if (!$internal->authenticate($this->authModule->data[$this->fields['username']])) {
+                        CakeLog::write('debug', 'Login failed. '.$e->getMessage());
+                        $this->Session->setFlash($e->getMessage(), $this->flashElement, array(), 'auth');
+                        return false;
+                    } else {
+                        CakeLog::write('debug', 'User logged in with internal authentication.');
+                    }
                 }
-                if ($this->autoRedirect) {
-                    $controller->redirect($this->redirect(), null, true);
-                }
-                return true;
-            } else {
-                CakeLog::write('debug', 'Login failed. '.$this->loginError);
-                $this->Session->setFlash($this->loginError, $this->flashElement, array(), 'auth');
-                return false;
             }
+
+            CakeLog::write('debug', 'User logged in');
+            $this->_loggedIn = true;
+
+            if (method_exists($controller, '_afterLogin')) {
+                $controller->_afterLogin();
+            }
+            if ($this->autoRedirect) {
+                $controller->redirect($this->redirect(), null, true);
+            }
+
+            return true;
         } else {
             // we are in other actions and we need authentication, redirect
             return $this->authModule->redirectToLogin($url);
