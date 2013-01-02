@@ -99,21 +99,26 @@ class GuardComponent extends AuthComponent {
         $this->loginAction = array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'login');
 
         // check the authentication module and new it
-        if(null == ($authModuleName = Configure::read('Guard.AuthModule.Name'))) {
+        if (null == ($authModuleName = Configure::read('Guard.AuthModule.Name'))) {
             $this->error($this->authModuleUndefined);
+        }
+
+        // if the auth_method is specified, use it to override configuration
+        if (isset($_REQUEST['auth_method'])) {
+            $authModuleName = $_REQUEST['auth_method'];
         }
 
         $authModuleFullName = $authModuleName.'Module';
 
-        if(!App::import('AuthModule', $authModuleFullName, true, $this->_getModuleSearchPath(), Inflector::underscore($authModuleFullName) . '.php')) {
+        if (!App::import('AuthModule', $authModuleFullName, true, $this->_getModuleSearchPath(), Inflector::underscore($authModuleFullName) . '.php')) {
             $this->error(sprintf($this->authModuleNotExist, $authModuleName));
         } else {
             $this->authModule = new $authModuleFullName($this, $authModuleName);
         }
 
         // check if all the required methods are defined
-        foreach($this->authRequiredMethods as $m) {
-            if(!method_exists($authModuleFullName, $m)) {
+        foreach ($this->authRequiredMethods as $m) {
+            if (!method_exists($authModuleFullName, $m)) {
                 $this->error(sprintf($this->authMethodUndefined, $m, $authModuleName));
             }
         }

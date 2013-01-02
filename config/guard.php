@@ -15,7 +15,7 @@ $config['Guard.AuthModule.Shibboleth'] = array(
         'eppn'        => array('/@ubc.ca/' => ''),
         'affiliation' => array('/staff@ubc.ca/' => 'admin'),
     ),
-    'loginError'          => 'You have successfully logged through Shibboleth. But you do not have access this appliction.',
+    'loginError'          => 'You have successfully logged in through Shibboleth. But you do not have access this appliction.',
     'loginImageButton'    => '',
     'loginTextButton'     => 'Login',
 );
@@ -34,4 +34,37 @@ $config['Guard.AuthModule.Ldap'] = array(
 //        'username' => 'uid',
     ),
     'fallbackInternal' => true,
+);
+
+$config['Guard.AuthModule.Cwl'] = array(
+    'sessionInitiatorURL' => 'https://www.auth.cwl.ubc.ca/auth/login',
+    'serviceName'         => 'ServiceName',
+    'fieldMapping'        => array(
+        'eppn'        => 'username',
+        'affiliation' => 'role',
+    ),
+    'mappingRules'        => array(
+        'eppn'        => array('/@ubc.ca/' => ''),
+        'affiliation' => array('/staff@ubc.ca/' => 'admin'),
+    ),
+    'loginError'          => 'You have successfully logged in. But you do not have access this appliction.',
+    'loginImageButton'    => '',
+    'loginTextButton'     => 'Login',
+    // CWL XML-RPC interface URLs: https://www.auth.verf.cwl.ubc.ca/auth/rpc (for verification)
+    //                             https://www.auth.cwl.ubc.ca/auth/rpc
+    'RPCURL'              => "https://www.auth.cwl.ubc.ca",
+    'RPCPath'             => "/auth/rpc",
+
+    /**
+     * the name of the function being called through XML-RPC. this is
+     * prepended with 'session.' later
+     */
+    //$CWLFunctionName    => 'getLoginName',
+    'functionName'        => 'getIdentities',
+
+    /**
+     * the application's ID/name and password as given by the CWL team
+     */
+    'applicationID'       => '',
+    'applicationPassword' => '',
 );
