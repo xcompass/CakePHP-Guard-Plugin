@@ -75,7 +75,7 @@ class CwlModule extends AuthModule {
      */
     function sessionInitiatorUrl($redirect = null) {
         $initiator_url = self::urlNormalize($this->sessionInitiatorURL) .
-            '?serviceName=' . $this->serviceName .
+            '?serviceName=' . $this->applicationID.
             '&serviceURL=' . Router::url(array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'login'), true);
 
         return $initiator_url;

@@ -38,7 +38,8 @@ $config['Guard.AuthModule.Ldap'] = array(
 
 $config['Guard.AuthModule.Cwl'] = array(
     'sessionInitiatorURL' => 'https://www.auth.cwl.ubc.ca/auth/login',
-    'serviceName'         => 'ServiceName',
+    'applicationID'       => 'ServiceName',
+    'applicationPassword' => 'ServicePassword',
     'fieldMapping'        => array(
         'eppn'        => 'username',
         'affiliation' => 'role',
