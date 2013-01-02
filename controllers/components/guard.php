@@ -189,7 +189,7 @@ class GuardComponent extends AuthComponent {
             $controller->_beforeLogin();
         }
 
-        if ($loginAction == $url) {
+        if ($loginAction == $url || $url == '/loginout/loginByCWL') {
             // we are in the login action
             try {
                 if (!$this->authModule->hasLoginData()) {
