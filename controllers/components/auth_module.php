@@ -251,7 +251,9 @@ class AuthModule extends Object {
      */
     function _mapFields() {
         foreach ($this->fieldMapping as $k => $v) {
-            $this->data[$v] = self::convertField($k, $_SERVER[$k]);
+            if (isset($_SERVER[$k])) {
+                $this->data[$v] = self::convertField($k, $_SERVER[$k]);
+            }
         }
     }
 
