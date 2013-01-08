@@ -89,8 +89,6 @@ class CwlModule extends AuthModule {
      * @return void
      */
     function authenticate($username = null) {
-        $loggedIn = false;
-
         $this->_mapFields();
 
         $ticket = $_GET['ticket'];
@@ -141,14 +139,9 @@ class CwlModule extends AuthModule {
             return false;
         }
 
-        $studentNumber = empty($data['student_number']) ? $data['guest_id'] : $data['student_number'];
+        $this->data[$this->guard->fields['username']] = empty($data['student_number']) ? $data['guest_id'] : $data['student_number'];
 
-        if ($user = $this->identify($studentNumber)) {
-            $this->Session->write($this->guard->sessionKey, $user);
-            $loggedIn = true;
-        }
-
-        return $loggedIn;
+        return true;
     }
 
     /**

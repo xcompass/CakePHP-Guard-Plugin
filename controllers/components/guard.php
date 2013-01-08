@@ -221,7 +221,7 @@ class GuardComponent extends AuthComponent {
                 }
             }
 
-            CakeLog::write('debug', 'User logged in');
+            CakeLog::write('debug', 'User '.$this->authModule->data[$this->fields['username']].' logged in');
             $this->_loggedIn = true;
 
             if (method_exists($controller, '_afterLogin')) {
