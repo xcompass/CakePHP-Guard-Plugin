@@ -92,54 +92,31 @@ class CwlModule extends AuthModule {
         $this->_mapFields();
 
         $ticket = $_GET['ticket'];
-
-        // now get some info about the session
+        $username = '';
 
         // the parameters passed to the RPC interface.  the ticket is the
-        // first argument for all functions
-        $params = array(new XML_RPC_Value($ticket, 'string'));
+        // first parameter for all functions
+        // we try PUID first
+        $puid = $this->sendRPCRequest('getPuid', array($ticket));
 
-        // note that the function name is prepended with the string 'session.'
-        $msg = new XML_RPC_Message("session.".$this->functionName, $params);
-
-        $cli = new XML_RPC_Client($this->RPCPath, $this->RPCURL);
-        $cli->setCredentials($this->applicationID, $this->applicationPassword);
-        //print_r ($cli);
-        //$cli->setDebug(1);
-
-        $resp = $cli->send($msg);
-        if (!$resp) {
-            CakeLog::write('error', 'Communication error: ' . $cli->errstr);
-            return false;
+        if ($this->identify($puid)) {
+            $username = $puid;
+        } else {
+            // try employee number or student number
+            $identities = $this->sendRPCRequest($this->functionName, array($ticket));
+            if (!empty($identities['employee_number']) && $this->identify($identities['employee_number'])) {
+                $username = $identities['employee_number'];
+            } elseif (!empty($identities['student_number']) && $this->identify($identities['student_number'])) {
+                $username = $identities['student_number'];
+            } elseif (!empty($identities['guest_id']) && $this->identify($identities['guest_id'])) {
+                $username = $identities['guest_id'];
+            } else {
+                CakeLog::write('error', 'No student number or guest id found.');
+                return false;
+            }
         }
 
-        // print the raw response data
-
-        //echo "<b>Raw Response:</b><br /><pre>";
-        //print_r($resp);
-        //echo "</pre>";
-
-        if ($resp->faultCode()) {
-            // error
-            CakeLog::write('error', 'Fault Code: ' . $resp->faultCode() . "," . 'Fault Reason: ' . $resp->faultString());
-            return false;
-        }
-
-        // an encoded response value
-        $val = $resp->value();
-
-        // the actual data we requested
-        $data = XML_RPC_decode($val);
-
-        //echo "<b>Response Data:</b><br /><pre>";
-        //print_r($data);
-        //echo "</pre>";
-        if (empty($data['student_number']) && empty($data['guest_id'])) {
-            CakeLog::write('error', 'No student number or guest id found.');
-            return false;
-        }
-
-        $this->data[$this->guard->fields['username']] = empty($data['student_number']) ? $data['guest_id'] : $data['student_number'];
+        $this->data[$this->guard->fields['username']] = $username;
 
         return true;
     }
@@ -168,4 +145,39 @@ class CwlModule extends AuthModule {
                 '?return=' . Router::url($this->guard->logoutRedirect, true);
         }
     }*/
+
+    function sendRPCRequest($method, $params) {
+        $rpcParams = array();
+        foreach($params as $param) {
+            $rpcParams[] = new XML_RPC_Value($param, 'string');
+        }
+
+        // note that the function name is prepended with the string 'session.'
+        $msg = new XML_RPC_Message("session.$method", $rpcParams);
+
+        $cli = new XML_RPC_Client($this->RPCPath, $this->RPCURL);
+        $cli->setCredentials($this->applicationID, $this->applicationPassword);
+
+        $resp = $cli->send($msg);
+        if (!$resp) {
+            CakeLog::write('error', 'Communication error: ' . $cli->errstr);
+            return false;
+        }
+
+        if ($resp->faultCode()) {
+            // error
+            CakeLog::write('error', 'Fault Code: ' . $resp->faultCode() . "," . 'Fault Reason: ' . $resp->faultString());
+            return false;
+        }
+
+        // an encoded response value
+        $val = $resp->value();
+        //CakeLog::write('debug', print_r($val, true));
+
+        // the actual data we requested
+        $data = XML_RPC_decode($val);
+        //CakeLog::write('debug', print_r($data, true));
+
+        return $data;
+    }
 }
