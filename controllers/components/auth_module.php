@@ -160,7 +160,10 @@ class AuthModule extends Object {
      */
     function redirectToLogin($url = null) {
         if (!$this->guard->RequestHandler->isAjax()) {
-            $this->Session->setFlash($this->guard->authError, $this->guard->flashElement, array(), 'auth');
+            // exclude root when displaying the auth error message
+            if ($url != Router::url('/', false)) {
+                $this->Session->setFlash($this->guard->authError, $this->guard->flashElement, array(), 'auth');
+            }
             if (!empty($this->controller->params['url']) && count($this->controller->params['url']) >= 2) {
                 $query = $this->controller->params['url'];
                 unset($query['url'], $query['ext']);
