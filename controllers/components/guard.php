@@ -204,6 +204,7 @@ class GuardComponent extends AuthComponent {
                     }
 
                     $this->Session->write($this->sessionKey, $user);
+                    CakeLog::write('login', 'User '.$this->authModule->data[$this->fields['username']].' logged in with '.$this->authModule->name.' module.');
                 } else {
                     throw new Exception($this->loginError);
                 }
@@ -212,16 +213,17 @@ class GuardComponent extends AuthComponent {
                     CakeLog::write('debug', 'Extneral authentication failed, fallback to internal authentication module.');
                     $internal = new DefaultModule($this);
                     if (!$internal->authenticate($this->authModule->data[$this->fields['username']])) {
-                        CakeLog::write('debug', 'Login failed. '.$e->getMessage());
+                        CakeLog::write('login', 'User '.$this->authModule->data[$this->fields['username']]. ' login failed with Default module. '.$e->getMessage());
                         $this->Session->setFlash($e->getMessage(), $this->flashElement, array(), 'auth');
                         return false;
                     } else {
-                        CakeLog::write('debug', 'User logged in with internal authentication.');
+                        CakeLog::write('login', 'User '.$this->authModule->data[$this->fields['username']].' logged in with Default module.');
                     }
+                } else {
+                    return false;
                 }
             }
 
-            CakeLog::write('debug', 'User '.$this->authModule->data[$this->fields['username']].' logged in');
             $this->_loggedIn = true;
 
             if (method_exists($controller, '_afterLogin')) {
@@ -305,6 +307,7 @@ class GuardComponent extends AuthComponent {
      */
     function logout() {
         $this->authModule->logout();
+        CakeLog::write('login', 'User '.$this->user('username').' logged out');
         if (method_exists($this->controller, '_afterLogout')) {
             $this->controller->_afterLogout();
         }
