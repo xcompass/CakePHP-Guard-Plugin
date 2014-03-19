@@ -189,7 +189,7 @@ class AuthModule extends Object {
      * @return string the login URL
      */
     function getLoginUrl() {
-        return Router::url(array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'login'), false);
+        return Router::normalize(array('plugin' => 'guard', 'controller' => 'guard', 'action' => 'login'));
     }
 
     /**
