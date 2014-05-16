@@ -174,7 +174,7 @@ class AuthModule extends Object {
             return false;
         } elseif (!empty($this->guard->ajaxLogin)) {
             $this->controller->viewPath = 'elements';
-            echo $this->controller->render($this->guard->ajaxLogin, $this->gurad->RequestHandler->ajaxLayout);
+            echo $this->controller->render($this->guard->ajaxLogin, $this->guard->RequestHandler->ajaxLayout);
             $this->_stop();
             return false;
         } else {
