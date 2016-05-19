@@ -2,7 +2,7 @@
     "name": "compass/cake-guard",
     "description": "Authentication Plugin for CakePHP 1.3",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "authors": [
         {
             "name": "Pan Luo",
