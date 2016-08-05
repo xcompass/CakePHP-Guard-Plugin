@@ -2,8 +2,9 @@
 
 //$config['Guard.AuthModule.Name'] = 'Ldap';    // Using LDAP module
 //$config['Guard.AuthModule.Name'] = 'Shibboleth';    // Using Shibboleth module
-$config['Guard.AuthModule.Name'] = 'Default';     // Using default (build-in) module
+$config['Guard.AuthModule.Name'] = getenv('IPEER_AUTH') ? getenv('IPEER_AUTH') : 'Default';     // Using default (build-in) module
 
+$config['Guard.AuthModule.Default'] = array();
 $config['Guard.AuthModule.Shibboleth'] = array(
     'sessionInitiatorURL' => 'https://%HOST%/Shibboleth.sso/Login',
     'logoutURL'           => 'https://%HOST%/Shibboleth.sso/Logout',
@@ -69,3 +70,25 @@ $config['Guard.AuthModule.Cwl'] = array(
     'applicationID'       => '',
     'applicationPassword' => '',
 );
+
+function override_from_env(&$config) {
+    $prefix = 'IPEER_AUTH_'.strtoupper($config['Guard.AuthModule.Name']).'_';
+    $auth_config = &$config['Guard.AuthModule.' . $config['Guard.AuthModule.Name']];
+    foreach($_ENV as $k => $v) {
+        if (0 === strpos($k, $prefix)) {
+            $key_str = substr($k, strlen($prefix)-strlen($k));
+            $keys = explode('_', $key_str);
+            $step = &$auth_config;
+            foreach($keys as $i => $key) {
+                if (!array_key_exists($key, $step)) {
+                    $step[$key] = ($i == count($keys) - 1) ? $v : array();
+                }
+                $step = &$step[$key];
+            }
+        }
+    }
+}
+
+override_from_env($config);
+
+var_dump($config);
