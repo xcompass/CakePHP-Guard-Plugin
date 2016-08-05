@@ -90,5 +90,3 @@ function override_from_env(&$config) {
 }
 
 override_from_env($config);
-
-var_dump($config);
