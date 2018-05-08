@@ -82,6 +82,8 @@ function override_from_env(&$config) {
             foreach($keys as $i => $key) {
                 if (!array_key_exists($key, $step)) {
                     $step[$key] = ($i == count($keys) - 1) ? $v : array();
+                }elseif (array_key_exists($key, $step) && $i == count($keys) - 1) {
+                    $step[$key] = $v;
                 }
                 $step = &$step[$key];
             }
