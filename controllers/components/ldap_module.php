@@ -71,6 +71,11 @@ class LdapModule extends AuthModule
                         // construct filter
                         $filters = array();
                         $entry = ldap_first_entry($ds, $result);
+                        // handle the filters that passed by environment vars
+                        if (!is_array($this->attributeSearchFilters)) {
+                            $this->attributeSearchFilters = explode(',', $this->attributeSearchFilters);
+
+                        }
                         foreach ($this->attributeSearchFilters as $filter) {
                             $values = ldap_get_values($ds, $entry, $filter);
                             $filters[] = $filter.'='.$values[0];
