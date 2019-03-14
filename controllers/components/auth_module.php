@@ -10,7 +10,7 @@
  * @author Compass
  * @license LGPL {@link http://www.gnu.org/copyleft/lesser.html}
  */
-class AuthModule extends Object {
+class AuthModule extends CakeObject {
 
     /**
      * hasLoginForm if the authentication module uses build-in login form.
