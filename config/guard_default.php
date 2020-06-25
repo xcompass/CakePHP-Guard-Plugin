@@ -83,7 +83,15 @@ function override_from_env(&$config) {
                 if (!array_key_exists($key, $step)) {
                     $step[$key] = ($i == count($keys) - 1) ? $v : array();
                 }elseif (array_key_exists($key, $step) && $i == count($keys) - 1) {
-                    $step[$key] = $v;
+                    if (is_bool($step[$key])) {
+                        $step[$key] = filter_var($v, FILTER_VALIDATE_BOOLEAN);
+                    } elseif (is_int($step[$key])) {
+                        $step[$key] = filter_var($v, FILTER_VALIDATE_INT);
+                    } elseif (is_array($step[$key])) {
+                        $step[$key] = json_decode($v, true);
+                    } else {
+                        $step[$key] = $v;
+                    }
                 }
                 $step = &$step[$key];
             }
