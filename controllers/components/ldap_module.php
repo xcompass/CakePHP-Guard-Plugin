@@ -68,30 +68,52 @@ class LdapModule extends AuthModule
                 if (@ldap_bind($ds, $info[0]['dn'], $this->data[$this->guard->fields['password']])) {
                     // we need to get attributes
                     if (!empty($this->attributeMap)) {
-                        // construct filter
-                        $filters = array();
-                        $entry = ldap_first_entry($ds, $result);
-                        // handle the filters that passed by environment vars
-                        if (!is_array($this->attributeSearchFilters)) {
-                            $this->attributeSearchFilters = explode(',', $this->attributeSearchFilters);
+                        $missingAttrs = array();
 
-                        }
-                        foreach ($this->attributeSearchFilters as $filter) {
-                            $values = ldap_get_values($ds, $entry, $filter);
-                            $filters[] = $filter.'='.$values[0];
+                        // check if we already got all attributes from first search
+                        foreach ($this->attributeMap as $key => $attr) {
+                            // convert to lower case as it is what returned from ldap
+                            $attr = strtolower($attr);
+                            if (array_key_exists($attr, $info[0]) && $info[0][$attr]['count'] > 0) {
+                                if ($info[0][$attr]['count'] == 1) {
+                                    $this->data[$key] = $info[0][$attr][0];
+                                } else {
+                                    $this->data[$key] = $info[0][$attr];
+                                    // remove useless 'count' attr from ldap
+                                    unset($this->data[$key]['count']);
+                                }
+                            } else {
+                                $missingAttrs[$key] = $attr;
+                            }
                         }
 
-                        // do the search
-                        if (!($result = ldap_search($ds, $info[0]['dn'], implode(',', $filters), array_values($this->attributeMap)))) {
-                            $this->guard->error(sprintf('Unable to perform LDAP seach with base DN %s and filter %s.',
-                                $info[0]['dn'], implode(',', $filters)));
-                            throw new Exception(sprintf('Unable to perform LDAP seach with base DN %s and filter %s.',
-                                $info[0]['dn'], implode(',', $filters)));
-                        }
-                        $entry = ldap_first_entry($ds, $result);
-                        foreach ($this->attributeMap as $key => $attribute) {
-                            $values = ldap_get_values($ds, $entry, $attribute);
-                            $this->data[$key] = $values[0];
+                        // if we still missing attributes, try search again with attribute filter
+                        if (!empty($missingAttrs)) {
+                            // construct filter
+                            $filters = array();
+                            $entry = ldap_first_entry($ds, $result);
+                            // handle the filters that passed by environment vars
+                            if (!is_array($this->attributeSearchFilters)) {
+                                $this->attributeSearchFilters = explode(',', $this->attributeSearchFilters);
+
+                            }
+                            foreach ($this->attributeSearchFilters as $filter) {
+                                $values = ldap_get_values($ds, $entry, $filter);
+                                $filters[] = $filter.'='.$values[0];
+                            }
+
+                            // do the search
+                            if (!($result = ldap_search($ds, $info[0]['dn'], implode(',', $filters), array_values($this->attributeMap)))) {
+                                $this->guard->error(sprintf('Unable to perform LDAP seach with base DN %s and filter %s.',
+                                    $info[0]['dn'], implode(',', $filters)));
+                                throw new Exception(sprintf('Unable to perform LDAP seach with base DN %s and filter %s.',
+                                    $info[0]['dn'], implode(',', $filters)));
+                            }
+                            $entry = ldap_first_entry($ds, $result);
+                            foreach ($this->attributeMap as $key => $attribute) {
+                                $values = ldap_get_values($ds, $entry, $attribute);
+                                $this->data[$key] = $values[0];
+                            }
                         }
                     }
                     $loggedIn = true;
