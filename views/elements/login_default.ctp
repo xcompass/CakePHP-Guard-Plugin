@@ -5,4 +5,4 @@ echo $form->input('username');
 echo $form->input('password');
 ?>
 <input type="hidden" name="auth_method" value="default" id="GuardAuthMethod">
-<?php echo $form->end('Login');
+<?php echo $form->end('Log In');
