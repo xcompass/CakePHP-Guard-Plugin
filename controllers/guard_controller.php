@@ -3,6 +3,13 @@
 class GuardController extends AppController {
     var $name = "Guard";
     var $uses = array();
+    
+    function beforeFilter()
+    {
+        parent::beforeFilter();
+        
+        $this->set('title_for_layout', __('Welcome to iPeer', true));
+    }
 
     /**
      * login login action
